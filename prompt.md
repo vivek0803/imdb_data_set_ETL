@@ -40,8 +40,7 @@ Prompting approach: Chain-of-thought (CoT) style prompting was used only for the
 Build a local data pipeline that:
 
 Downloads the 2GB IMDb dataset from Kaggle (login required) - https://www.kaggle.com/datasets/ashirwadsangwan/imdb-dataset
-a. Extract the necessary data for analysis, such as:
-   i. Movie titles, ratings, episodes and other pertinent information.
+Extract the necessary data for analysis, such as: Movie titles, ratings, episodes and other pertinent information.
 
 Processes the IMDb dataset using PySpark.
 Saves the data as partitioned Parquet files (the "Lake").
