@@ -46,14 +46,7 @@ download: ## Download IMDb dataset via kagglehub (auto-authenticates with Kaggle
 
 etl: ## Run PySpark ETL job (produces Snappy Parquet in data/lake/)
 	rm -rf data/lake/titles data/lake/people data/lake/principals data/lake/akas
-	@for title_type in movie short tvEpisode tvMiniSeries tvMovie tvPilot tvSeries tvShort tvSpecial video videoGame; do \
-	    echo "=== ETL titles chunk: $$title_type ==="; \
-	    $(SPARK_SUBMIT) /opt/spark/jobs/etl_job.py \
-	        --input /data/raw \
-	        --output /data/lake \
-	        --dataset titles \
-	        --title-type $$title_type; \
-	done
+	$(SPARK_SUBMIT) /opt/spark/jobs/etl_job.py --input /data/raw --output /data/lake --dataset titles
 	$(SPARK_SUBMIT) /opt/spark/jobs/etl_job.py --input /data/raw --output /data/lake --dataset people
 	$(SPARK_SUBMIT) /opt/spark/jobs/etl_job.py --input /data/raw --output /data/lake --dataset principals
 	$(SPARK_SUBMIT) /opt/spark/jobs/etl_job.py --input /data/raw --output /data/lake --dataset akas
