@@ -1,0 +1,73 @@
+services:
+  spark-master:
+    image: apache/spark:3.5.5
+    container_name: spark-master
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
+    ports:
+      - "8085:8080"   # Spark Web UI
+      - "7077:7077"   # Spark master RPC
+      - "4040:4040"   # Spark application UI (when a job runs)
+    volumes:
+      - ./data:/data
+      - ./etl_job.py:/opt/spark/jobs/etl_job.py
+    networks:
+      - pipeline-net
+
+  spark-worker:
+    image: apache/spark:3.5.5
+    container_name: spark-worker
+    command:
+      - /opt/spark/bin/spark-class
+      - org.apache.spark.deploy.worker.Worker
+      - spark://spark-master:7077
+      - --cores
+      - "1"
+      - --memory
+      - 2G
+    ports:
+      - "18081:8081"  # Spark Worker UI
+    depends_on:
+      - spark-master
+    volumes:
+      - ./data:/data
+      - ./etl_job.py:/opt/spark/jobs/etl_job.py
+    networks:
+      - pipeline-net
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: clickhouse
+    ports:
+      - "8123:8123"   # HTTP interface (used by clickhouse-connect + client)
+      - "9000:9000"   # Native TCP interface
+    environment:
+      - CLICKHOUSE_DB=imdb
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-}
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - clickhouse-logs:/var/log/clickhouse-server
+      # DDL runs automatically on first startup
+      - ./ddl:/docker-entrypoint-initdb.d:ro
+      # Mount the Parquet lake so ClickHouse can read files natively
+      - ./data/lake:/data/lake:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - pipeline-net
+
+volumes:
+  clickhouse-data:
+  clickhouse-logs:
+
+networks:
+  pipeline-net:
+    driver: bridge
