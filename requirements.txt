@@ -1,0 +1,20 @@
+# IMDb ELT Pipeline — Python dependencies
+# Install: pip install -r requirements.txt
+
+# Dataset download
+kagglehub>=0.3.0
+
+# PySpark (matches Docker image version)
+pyspark==3.5.5
+
+# Parquet I/O and Arrow-based inserts
+pyarrow>=15.0.0
+
+# ClickHouse Python client (HTTP-based, supports Arrow/Parquet inserts)
+clickhouse-connect>=0.7.16
+
+# Environment variable loading
+python-dotenv>=1.0.0
+
+# Progress bars for load script
+tqdm>=4.66.0
