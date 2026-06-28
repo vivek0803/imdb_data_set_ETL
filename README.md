@@ -157,9 +157,7 @@ PySpark job submitted to the Spark cluster via `spark-submit`. Key steps:
    - `principals/`: `category`
    - `akas/`: `region`
 
-There is no `episodes/` partition in the current pipeline. `title.episode.tsv`
-is not part of the downloaded/loaded datasets, so no `imdb.episodes` table is
-created.
+
 
 ### `load_to_olap.py`
 
@@ -257,13 +255,7 @@ data/lake/akas/
 Missing or blank regions are kept as `XX`, so alternate-title rows are not
 dropped just because region is unknown.
 
-### Why There Is No `episodes/` Partition
 
-The current pipeline does not ingest `title.episode.tsv`, so it does not write
-`data/lake/episodes/` and does not create `imdb.episodes`. TV episodes still
-exist in `imdb.titles` as rows where `titleType = 'tvEpisode'`; what is missing
-is the parent-series relationship and season/episode numbering from
-`title.episode.tsv`.
 
 ---
 
